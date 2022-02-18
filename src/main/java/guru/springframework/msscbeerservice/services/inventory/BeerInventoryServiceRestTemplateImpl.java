@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ConfigurationProperties(prefix = "sfg.brewery", ignoreUnknownFields = true)
+@Profile("!local-discovery")
 @Component
 public class BeerInventoryServiceRestTemplateImpl implements BeerInventoryService {
 	
+	
 	public static final String INVENTORY_PATH = "/api/v1/beer/{beerId}/inventory";
+	
     @SuppressWarnings("unused")
 	private final RestTemplate restTemplate;
     
@@ -37,6 +41,7 @@ public class BeerInventoryServiceRestTemplateImpl implements BeerInventoryServic
 
 	@Override
 	public Integer getOnhandInventory(UUID beerId) {
+        log.debug("Calling Inventory Service RestTemplate - BeerId: " + beerId);
 		
 		ResponseEntity<List<BeerInventoryDto>> responseEntity = restTemplate
 				.exchange(beerInventoryServiceHost + INVENTORY_PATH, HttpMethod.GET, null, 
